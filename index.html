@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Regene4T HP改修案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: one long scroll page; full-width colour bands (deep plum / white / pale lilac) with a 1120px inner column. Single light look by design, matching the Wix build. */
+:root{
+  --plum:#2B1840;        /* 濃い紫（指定） */
+  --plum-2:#3B2457;
+  --gold:#E3A33A;        /* 山吹色（指定） */
+  --lilac:#EEE8F8;       /* 薄紫（指定） */
+  --ink:#231B2E;
+  --muted:#5E5670;
+  --line:#D9D1E6;
+  --paper:#FFFFFF;
+  --cyan:#7FD3E6;
+  --mark:#FFF1B8;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  --f-latin:"Jost","Helvetica Neue",Arial,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--plum)}
+a{color:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance;line-height:1.4}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{padding-block:88px}
+.band.lilac{background:var(--lilac)}
+.band.plum{background:var(--plum);color:#fff}
+.todo{background:var(--mark);color:#5A3F00;padding:0 .25em;border-radius:2px;font-weight:500}
+.plum .todo{color:#5A3F00}
+.note-todo{display:block;margin-top:14px;font-size:13px;line-height:1.7;color:#6B4A00;background:var(--mark);border-left:3px solid var(--gold);padding:8px 12px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- header ---------- */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--plum);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.hdr .wrap{display:flex;align-items:center;gap:24px;min-height:68px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0}
+.logo{width:40px;height:40px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-family:var(--f-latin);font-weight:600;color:var(--gold);font-size:15px;letter-spacing:.02em}
+.brand b{display:block;font-size:17px;font-weight:700;letter-spacing:.06em;line-height:1.2}
+.brand small{display:block;font-family:var(--f-latin);font-size:11px;letter-spacing:.08em;opacity:.7;line-height:1.3}
+.nav{display:flex;align-items:center;gap:22px;margin-left:auto;font-size:14px}
+.nav a{text-decoration:none;opacity:.88}
+.nav a:hover{opacity:1;color:var(--gold)}
+.nav .cta{opacity:1;background:var(--gold);color:var(--plum);font-weight:700;padding:8px 16px;border-radius:999px}
+.nav .cta:hover{color:var(--plum);background:#EDB656}
+.menu-btn{display:none;margin-left:auto;background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:6px 12px;font:inherit;font-size:13px}
+@media (max-width:960px){
+  .menu-btn{display:block}
+  .nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--plum);flex-direction:column;align-items:stretch;gap:0;padding:8px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(255,255,255,.1)}
+  .nav.open{display:flex}
+  .nav a{padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .nav .cta{margin-top:12px;text-align:center;border:0}
+}
+
+/* ---------- hero ---------- */
+.hero{background:var(--plum);color:#fff;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:72px 64px}
+.eyebrow{font-family:var(--f-latin);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.hero h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,4.4vw,50px);line-height:1.45;letter-spacing:.04em;margin-top:18px}
+.hero h1 span{display:block}
+.hero p.lead{margin-top:24px;font-size:16px;line-height:2;color:rgba(255,255,255,.86);max-width:34em}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;border:1.5px solid transparent;cursor:pointer;font-family:inherit}
+.btn.gold{background:var(--gold);color:var(--plum)}
+.btn.gold:hover{background:#EDB656}
+.btn.line{border-color:rgba(255,255,255,.6);color:#fff;background:transparent}
+.btn.line:hover{border-color:#fff;background:rgba(255,255,255,.06)}
+.btn.plum{background:var(--plum);color:#fff}
+.btn.plum:hover{background:var(--plum-2)}
+.btn.outline{border-color:var(--plum);color:var(--plum);background:transparent}
+.btn.outline:hover{background:var(--lilac)}
+.hero-fig{margin:0;position:relative}
+.micro{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:4px;overflow:hidden;background:#07060C;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.micro canvas{position:absolute;inset:0;width:100%;height:100%}
+.tag-file{position:absolute;left:10px;top:10px;font-family:var(--f-mono);font-size:11px;background:rgba(0,0,0,.55);color:#fff;padding:3px 8px;border-radius:3px;letter-spacing:.02em}
+.hero-fig figcaption{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:10px;text-align:right;line-height:1.6}
+.stats{border-top:1px solid rgba(255,255,255,.12);background:var(--plum-2)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.stat{padding:22px 20px;border-left:1px solid rgba(255,255,255,.12)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font-family:var(--f-display);font-size:20px;letter-spacing:.04em;color:#fff}
+.stat span{display:block;font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.6;margin-top:4px}
+@media (max-width:860px){
+  .hero .wrap{grid-template-columns:1fr;gap:36px;padding-block:48px}
+  .stats .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat{padding:18px 14px}
+  .stat:nth-child(odd){border-left:0;padding-left:0}
+  .stat:nth-child(n+3){border-top:1px solid rgba(255,255,255,.12)}
+}
+
+/* ---------- section heads ---------- */
+.sh{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.sh h2{font-family:var(--f-display);font-size:clamp(26px,3vw,34px);letter-spacing:.06em;color:var(--plum)}
+.plum .sh h2{color:#fff}
+.sh .en{font-family:var(--f-latin);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.section-lead{margin-top:18px;max-width:46em;color:var(--muted);font-size:16px}
+.sub{font-family:var(--f-display);font-size:22px;color:var(--plum);letter-spacing:.04em}
+.sub small{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:500;margin-left:12px;letter-spacing:.04em}
+
+/* ---------- placeholders ---------- */
+.ph{position:relative;background:
+  repeating-linear-gradient(135deg,rgba(43,24,64,.05) 0 10px,rgba(43,24,64,.0) 10px 20px),#F6F3FA;
+  border:1px dashed #BBAED0;border-radius:4px;display:grid;place-items:center;text-align:center;color:var(--muted);aspect-ratio:4/3;max-width:100%;padding:12px}
+.ph .fn{font-family:var(--f-mono);font-size:12.5px;color:var(--plum);font-weight:600}
+.ph .what{font-size:12px;margin-top:4px;line-height:1.6}
+.ph.dark{background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 10px,transparent 10px 20px),#14101B;border-color:#4A3E5C;color:rgba(255,255,255,.65)}
+.ph.dark .fn{color:var(--gold)}
+figure{margin:0}
+figcaption.cap{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6}
+
+/* ---------- technology ---------- */
+.cell-block{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:56px;align-items:start}
+.cell-block .txt>p{margin-top:16px}
+.feat{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:0;border-top:1px solid var(--line)}
+.feat li{display:grid;grid-template-columns:11em minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.feat li b{color:var(--plum);font-weight:700;font-size:15px;line-height:1.7}
+.feat li span{font-size:15px;color:var(--ink);line-height:1.8}
+.figs{display:grid;gap:16px}
+.figs .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ph.diagram{aspect-ratio:16/9}
+.neurite-strip{background:#0B0910;color:#fff;margin-top:64px;padding-block:44px}
+.neurite-strip .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.neurite-strip figure .micro{aspect-ratio:16/10}
+.neurite-strip .lab{position:absolute;right:10px;bottom:10px;font-size:12px;background:rgba(0,0,0,.55);padding:2px 8px;border-radius:3px}
+.neurite-strip p{margin-top:18px;font-size:14px;color:rgba(255,255,255,.8);max-width:58em;line-height:1.9}
+@media (max-width:860px){
+  .cell-block{grid-template-columns:1fr;gap:28px}
+  .feat li{grid-template-columns:1fr;gap:2px}
+  .neurite-strip .grid{grid-template-columns:1fr}
+}
+
+/* ---------- R&D ---------- */
+.rd-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;margin-top:48px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:28px}
+.panel h3{font-size:17px;color:var(--plum);font-weight:700}
+.panel .desc{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.7}
+.panel .ph{margin-top:18px;aspect-ratio:3/2}
+.rats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rats .ph{aspect-ratio:4/3}
+.caution{margin-top:18px;border:1.5px solid var(--plum);border-radius:4px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--plum);background:var(--paper);line-height:1.7}
+.caution::before{content:"ご注意　";color:var(--gold)}
+.stage-wrap{margin-top:64px}
+.stage-wrap>p{margin-top:12px;color:var(--muted);max-width:46em}
+.stages{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;counter-reset:st}
+.stages li{position:relative;padding:22px 18px 20px;background:var(--paper);border:1px solid var(--line);border-left-width:0}
+.stages li:first-child{border-left-width:1px;border-radius:6px 0 0 6px}
+.stages li:last-child{border-radius:0 6px 6px 0}
+.stages .no{font-family:var(--f-latin);font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.1em}
+.stages h4{font-size:16px;margin-top:6px;color:var(--plum)}
+.stages p{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.7}
+.stages li.now{background:var(--plum);border-color:var(--plum);color:#fff}
+.stages li.now h4{color:#fff}
+.stages li.now p{color:rgba(255,255,255,.8)}
+.stages li.now .no{color:var(--gold)}
+.now-badge{position:absolute;top:-12px;left:18px;background:var(--gold);color:var(--plum);font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;line-height:1.7}
+.ip{margin-top:64px}
+.tbl-wrap{overflow-x:auto;margin-top:20px;background:var(--paper);border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.7}
+thead th{font-size:12.5px;letter-spacing:.08em;color:var(--muted);font-weight:500;background:#FAF8FD}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+.st{display:inline-block;font-size:12.5px;padding:1px 10px;border-radius:999px;white-space:nowrap}
+.st.ok{background:var(--lilac);color:var(--plum);font-weight:700}
+.st.pend{background:#F3F0F6;color:var(--muted);border:1px solid var(--line)}
+@media (max-width:860px){
+  .rd-grid{grid-template-columns:1fr;gap:24px}
+  .stages{grid-template-columns:1fr;gap:12px}
+  .stages li,.stages li:first-child,.stages li:last-child{border-left-width:1px;border-radius:6px}
+  .panel{padding:20px}
+}
+
+/* ---------- products ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:44px}
+.card{border:1px solid var(--line);border-radius:6px;padding:26px 24px;display:flex;flex-direction:column;gap:14px;background:var(--paper)}
+.card .kind{font-family:var(--f-latin);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.card h3{font-family:var(--f-display);font-size:22px;color:var(--plum);letter-spacing:.03em}
+.card h3 small{display:block;font-family:var(--f-latin);font-size:13px;color:var(--muted);font-weight:400;letter-spacing:.04em;margin-top:2px}
+.card p{font-size:14.5px;line-height:1.85}
+.card dl{margin:auto 0 0;padding-top:14px;border-top:1px solid var(--line);display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:13.5px}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.ruo{margin-top:28px;border:1.5px solid var(--plum);border-radius:6px;padding:20px 24px}
+.ruo h3{font-size:16px;color:var(--plum)}
+.ruo p{margin-top:8px;font-size:14.5px}
+.fac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:36px}
+.fac .ph{aspect-ratio:3/2}
+@media (max-width:860px){.cards,.fac{grid-template-columns:1fr}}
+
+/* ---------- news ---------- */
+.news-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;margin-top:44px;align-items:start}
+.tl{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.tl li{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4em;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14.5px;align-items:baseline}
+.tl time{font-family:var(--f-latin);font-variant-numeric:tabular-nums;color:var(--plum);font-weight:500;font-size:14px}
+.tl .t{justify-self:end;font-size:11.5px;border:1px solid var(--plum);color:var(--plum);border-radius:999px;padding:0 9px;line-height:1.8;white-space:nowrap}
+.tl .t.blank{border:0}
+@media (max-width:860px){
+  .news-grid{grid-template-columns:1fr;gap:28px}
+  .tl li{grid-template-columns:minmax(0,1fr) auto;gap:2px 12px}
+  .tl time{grid-column:1/-1}
+}
+
+/* ---------- company ---------- */
+.ceo{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;margin-top:48px;align-items:start}
+.ceo .ph{aspect-ratio:3/4}
+.ceo blockquote{margin:0;font-family:var(--f-display);font-size:18px;line-height:2.05;color:var(--ink);letter-spacing:.02em}
+.ceo .sign{margin-top:18px;font-weight:700;color:var(--plum)}
+.ceo .bio{margin-top:20px;font-size:13px;color:var(--muted);line-height:1.9;padding-top:16px;border-top:1px solid var(--line)}
+.co-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;margin-top:56px;align-items:start}
+.co th{width:8.5em;font-weight:500;color:var(--muted);font-size:13.5px;white-space:nowrap}
+.adv h3{font-size:16px;color:var(--plum);margin-bottom:12px}
+.adv ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.adv li{padding:14px 0;border-bottom:1px solid var(--line)}
+.adv li b{display:block;font-size:15.5px}
+.adv li span{font-size:13px;color:var(--muted);line-height:1.7}
+@media (max-width:860px){
+  .ceo{grid-template-columns:1fr;gap:20px}
+  .ceo .ph{max-width:220px}
+  .co-grid{grid-template-columns:1fr}
+  .co th{white-space:normal;width:6.5em}
+}
+
+/* ---------- partner / recruit ---------- */
+.pr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.box{border-radius:8px;padding:36px 34px;display:flex;flex-direction:column;gap:16px}
+.box.dark{background:var(--plum);color:#fff}
+.box.light{background:var(--paper);border:1px solid var(--line)}
+.box h2{font-family:var(--f-display);font-size:24px;letter-spacing:.05em}
+.box.light h2{color:var(--plum)}
+.box ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.box li{padding-left:18px;position:relative;font-size:15px}
+.box li::before{content:"";position:absolute;left:0;top:.8em;width:8px;height:2px;background:var(--gold)}
+.box .small{font-size:13.5px;line-height:1.85}
+.box.dark .small{color:rgba(255,255,255,.78)}
+.box.light .small{color:var(--muted)}
+.box .btn{align-self:flex-start;margin-top:auto}
+@media (max-width:860px){.pr{grid-template-columns:1fr}.box{padding:28px 22px}}
+
+/* ---------- contact ---------- */
+.form{margin-top:36px;max-width:760px;display:grid;gap:20px}
+.f label{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--plum);margin-bottom:6px}
+.req,.opt{font-size:11px;font-weight:700;padding:0 7px;border-radius:3px;line-height:1.8}
+.req{background:var(--plum);color:#fff}
+.opt{background:#F0ECF5;color:var(--muted)}
+.f input[type=text],.f input[type=email],.f select,.f textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--paper);border:1px solid #C9BFD8;border-radius:5px;padding:11px 13px}
+.f textarea{min-height:160px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--plum);box-shadow:0 0 0 3px rgba(227,163,58,.35)}
+.agree{display:flex;align-items:flex-start;gap:10px;font-size:14.5px}
+.agree input{margin-top:6px;width:18px;height:18px;accent-color:var(--plum)}
+.agree a{color:var(--plum);font-weight:700}
+.err{color:#A3261B;font-size:13px;margin-top:4px}
+.sent{border:1.5px solid var(--plum);background:var(--lilac);color:var(--plum);border-radius:6px;padding:16px 20px;font-weight:700}
+.form-meta{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* ---------- english ---------- */
+.en-body{margin-top:24px;max-width:48em;font-family:var(--f-latin);font-size:16.5px;line-height:1.8;display:grid;gap:16px;color:var(--ink)}
+.en-title{font-family:var(--f-latin);font-weight:600;font-size:clamp(26px,3vw,34px);color:var(--plum);letter-spacing:.01em}
+
+/* ---------- footer ---------- */
+.ftr{background:var(--plum);color:#fff;padding-block:56px 40px}
+.ftr .top{display:flex;flex-wrap:wrap;gap:32px;justify-content:space-between;align-items:flex-start}
+.ftr address{font-style:normal;font-size:13.5px;color:rgba(255,255,255,.75);margin-top:12px}
+.flinks{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13.5px;max-width:560px}
+.flinks a{text-decoration:none;opacity:.85}
+.flinks a:hover{opacity:1;color:var(--gold)}
+.copy{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14);font-size:12px;color:rgba(255,255,255,.6);line-height:1.8}
+
+/* ---------- privacy page ---------- */
+.pp{padding-block:64px 88px}
+.pp .back{font-size:14px;color:var(--plum);font-weight:700;text-decoration:none}
+.pp h1{font-family:var(--f-display);font-size:clamp(26px,3vw,34px);color:var(--plum);letter-spacing:.06em;margin-top:20px}
+.pp article{max-width:46em;margin-top:28px;display:grid;gap:22px;font-size:15.5px}
+.pp h2{font-size:17px;color:var(--plum)}
+.pp ol{margin:6px 0 0;padding-left:1.4em;display:grid;gap:4px}
+.pp .sig{text-align:right;line-height:1.9}
+
+/* mock banner */
+.mock{background:var(--mark);color:#5A3F00;font-size:12.5px;line-height:1.7;text-align:center;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px))}
+</style>
+</head>
+<body>
+<div class="mock">改修案（Wix制作用の見本）。斜線の枠は画像の配置場所、<span class="todo">黄色</span>は公開前に会社で確認・記入する箇所です。</div>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="リジェネフォーティー トップへ">
+      <span class="logo" aria-hidden="true">R4</span>
+      <span><b>リジェネフォーティー</b><small>Regene4T Co., Ltd.</small></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">メニュー</button>
+    <nav class="nav" id="nav">
+      <a href="#technology">技術</a>
+      <a href="#rd">研究開発</a>
+      <a href="#products">製品・サービス</a>
+      <a href="#news">活動・実績</a>
+      <a href="#company">会社情報</a>
+      <a href="#english">English</a>
+      <a class="cta" href="#contact">お問い合わせ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="home">
+<!-- ===== 冒頭 ===== -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Regenerative Medicine Venture · Kobe</div>
+      <h1><span>神経へ向かう細胞を、</span><span>新しい治療の選択肢に。</span></h1>
+      <p class="lead">リジェネフォーティーは、独自に樹立した幹細胞「NEcST®細胞」と「X4N2®細胞」をもとに、脊髄損傷や変形性関節症の治療法の研究開発を進める、神戸医療産業都市の再生医療ベンチャーです。</p>
+      <div class="btns">
+        <a class="btn gold" href="#rd">研究開発を見る →</a>
+        <a class="btn line" href="#contact">共同研究・お取引のご相談</a>
+      </div>
+    </div>
+    <figure class="hero-fig">
+      <div class="micro"><canvas data-neurite="rich" aria-hidden="true"></canvas><span class="tag-file">neurite.jpg</span></div>
+      <figcaption>NEcST®細胞の培養上清を加えた神経分化系で伸びる神経突起（黄）</figcaption>
+    </figure>
+  </div>
+  <div class="stats">
+    <div class="wrap">
+      <div class="stat"><b>2021年設立</b><span>岡山県のベンチャー支援事業を経て創業</span></div>
+      <div class="stat"><b>神戸医療産業都市</b><span>クリエイティブラボ神戸に研究・製造拠点</span></div>
+      <div class="stat"><b>国内特許査定 4件</b><span>NEcST®細胞、培養上清などに関する特許</span></div>
+      <div class="stat"><b>エーザイ賞</b><span>メドテックグランプリKOBE2023</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 技術 ===== -->
+<section class="band" id="technology">
+  <div class="wrap">
+    <div class="sh"><h2>技術</h2><span class="en">Technology</span></div>
+    <p class="section-lead">幹細胞の中から、目的の組織に分化する力をもつ細胞だけを選び出し、性質のそろった細胞として樹立する。この考え方から、神経系と軟骨系の2種類の独自細胞が生まれました。</p>
+
+    <div class="cell-block">
+      <div class="txt">
+        <h3 class="sub">NEcST®細胞<small>神経系の幹細胞</small></h3>
+        <p>脂肪、臍帯、歯髄などから得られる間葉系幹細胞のうち、神経に分化する力をもつ細胞はごく一部です。当社は、その細胞を選び出して濃縮し、神経幹細胞としての性質をもつ細胞集団「NEcST®細胞」を樹立しました。名称は、神経（NEuron）、濃縮（Concentration）、幹細胞（STem cell）に由来します。</p>
+        <ul class="feat">
+          <li><b>増やしやすい</b><span>研究や治療に必要な細胞数を、培養によって確保しやすい性質をもちます。</span></li>
+          <li><b>神経細胞に分化しやすい</b><span>効率よく神経系の細胞へ分化します。</span></li>
+          <li><b>神経に働く因子を分泌する</b><span>培養上清には、神経突起の伸長を促す成分が含まれることを細胞実験で確認しています。</span></li>
+        </ul>
+      </div>
+      <div class="figs">
+        <div class="ph diagram"><div><div class="fn">necst_diagram.png</div><div class="what">NEcST®細胞の選別・濃縮の図</div></div></div>
+        <div class="pair">
+          <figure><div class="ph"><div><div class="fn">necst1.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">培養中のNEcST®細胞</figcaption></figure>
+          <figure><div class="ph"><div><div class="fn">necst2.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">神経細胞へ分化した様子</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="neurite-strip">
+    <div class="wrap">
+      <div class="grid">
+        <figure><div class="micro"><canvas data-neurite="rich" aria-hidden="true"></canvas><span class="tag-file">neurite.jpg</span><span class="lab">NEcST®細胞の培養上清</span></div></figure>
+        <figure><div class="micro"><canvas data-neurite="sparse" aria-hidden="true"></canvas><span class="tag-file">neurite_ctrl.jpg</span><span class="lab">脂肪由来細胞の培養上清</span></div></figure>
+      </div>
+      <p>神経分化中の細胞にNEcST®細胞の培養上清を加えると、神経突起（黄）の形成が活発になりました（左）。脂肪由来細胞の培養上清を加えた場合は、ほとんど見られませんでした（右）。水色は細胞の核です。</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cell-block">
+      <div class="txt">
+        <h3 class="sub">X4N2®細胞<small>軟骨系の幹細胞</small></h3>
+        <p>間葉系幹細胞から選び出し、クローン化した細胞です。従来は難しかった平面培養だけで、関節軟骨の細胞（硝子軟骨細胞）や軟骨ペレットを効率よく形成できます。</p>
+        <ul class="feat">
+          <li><b>平面培養で軟骨へ分化する</b><span>完全無血清・ゼノフリー（動物由来成分を含まない）の軟骨分化培地で分化誘導できます。</span></li>
+          <li><b>培養上清が軟骨分化に働く</b><span>X4N2®細胞の培養上清をヒト軟骨細胞に加えると、軟骨分化に関わる因子SOX9の発現が、対照の約8倍に上昇しました（社内データ）。</span></li>
+        </ul>
+      </div>
+      <figure><div class="ph"><div><div class="fn">chondro.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">無血清・ゼノフリー培地で軟骨細胞へ分化誘導したX4N2®細胞</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 研究開発 ===== -->
+<section class="band lilac" id="rd">
+  <div class="wrap">
+    <div class="sh"><h2>研究開発</h2><span class="en">Research &amp; Development</span></div>
+    <p class="section-lead">損傷した神経が自然には回復しにくい脊髄損傷を中心に、根本的な治療法がまだ確立されていない疾患を対象として、細胞と培養上清の両面から研究を進めています。現在は非臨床研究の段階です。</p>
+
+    <div class="rd-grid">
+      <div class="panel">
+        <h3>脊髄損傷モデルラットでの運動機能の推移</h3>
+        <p class="desc">NEcST®細胞の培養上清を投与した群と、培地のみを投与した対照群の比較（BBBスコア：後肢の運動機能の評価指標）</p>
+        <div class="ph"><div><div class="fn">bbb_chart.png</div><div class="what">グラフ（横軸：損傷後の週数／縦軸：BBBスコア）</div></div></div>
+        <span class="note-todo">【公開前に、原データ（各群の匹数、誤差範囲、統計処理）にもとづく図に差し替え】</span>
+      </div>
+      <div>
+        <div class="rats">
+          <figure><div class="ph"><div><div class="fn">rat1.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">移植しない群：後肢を引きずって移動</figcaption></figure>
+          <figure><div class="ph"><div><div class="fn">rat2.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">NEcST®細胞を移植した群：後肢を使って移動</figcaption></figure>
+        </div>
+        <p style="margin-top:20px">脊髄損傷モデルラットにNEcST®細胞を移植した実験、および培養上清のみを投与した実験の両方で、運動機能の回復がみられました。細胞を使わない培養上清での検討は、治療にかかる時間と負担を抑えられる可能性があり、研究を進めています。</p>
+        <p class="caution">いずれも動物実験の結果です。ヒトでの有効性と安全性は確認されていません。</p>
+      </div>
+    </div>
+
+    <div class="stage-wrap">
+      <h3 class="sub">開発の段階</h3>
+      <p>基礎研究から実用化まで、段階を追って進めます。臨床段階からは、大学・医療機関や製薬企業などの開発パートナーとの連携を想定しています。</p>
+      <ol class="stages">
+        <li><div class="no">STEP 1</div><h4>基礎研究</h4><p>NEcST®細胞・X4N2®細胞の樹立と性質の確認</p></li>
+        <li class="now"><span class="now-badge">現在の段階</span><div class="no">STEP 2</div><h4>非臨床研究</h4><p>動物モデルでの有効性・安全性の検討</p></li>
+        <li><div class="no">STEP 3</div><h4>臨床研究</h4><p>大学・医療機関との共同研究</p></li>
+        <li><div class="no">STEP 4</div><h4>治験</h4><p>開発パートナーと連携して実施</p></li>
+        <li><div class="no">STEP 5</div><h4>承認申請・実用化</h4><p>医薬品・再生医療等製品としての承認</p></li>
+      </ol>
+    </div>
+
+    <div class="ip">
+      <h3 class="sub">知的財産</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>対象</th><th>特許の状況</th><th>商標</th></tr></thead>
+          <tbody>
+            <tr><td>NEcST®細胞</td><td><span class="st ok">特許査定（国内）</span></td><td>登録済み</td></tr>
+            <tr><td>NEcST®細胞の培養上清（リネルボ®）</td><td><span class="st ok">特許査定（国内）</span></td><td>登録済み</td></tr>
+            <tr><td>抗NEcST®細胞抗体</td><td><span class="st pend">出願済み・審査請求中</span></td><td></td></tr>
+            <tr><td>抗CD81抗体</td><td><span class="st ok">特許査定（国内）</span></td><td></td></tr>
+            <tr><td>抗CD81抗体遺伝子を搭載した治療用ベクター</td><td><span class="st pend">出願済み</span></td><td></td></tr>
+            <tr><td>チョウマメ抽出物（皮膚への作用）</td><td><span class="st ok">特許査定（国内）</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span class="note-todo">【公開前に、特許番号・登録番号を記載。リネルボの特許状況（出願済か査定済か）を確認】</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 製品・サービス ===== -->
+<section class="band" id="products">
+  <div class="wrap">
+    <div class="sh"><h2>製品・サービス</h2><span class="en">Products &amp; Services</span></div>
+    <p class="section-lead">研究開発で培った細胞培養と精製の技術をもとに、研究機関・企業のお客様へ研究用試薬と培養受託を提供しています。</p>
+
+    <div class="cards">
+      <article class="card">
+        <div class="kind">Research Reagent</div>
+        <h3>リネルボ®<small>Renervo®</small></h3>
+        <p>NEcST®細胞の培養上清を、独自の方法で精製・濃縮した研究用試薬です。NEcST®細胞の培養上清「リネルボＳ」と、神経分化させたNEcST®細胞の培養上清「リネルボＰ」があります。</p>
+        <dl><dt>区分</dt><dd>研究用試薬</dd><dt>形態</dt><dd>凍結品、凍結乾燥品</dd><dt>規格</dt><dd>1mL／本</dd></dl>
+      </article>
+      <article class="card">
+        <div class="kind">Research Reagent</div>
+        <h3>コングロ<small>ChongroX</small></h3>
+        <p>X4N2®細胞の培養上清を精製した研究用試薬です。軟骨分化や関節組織に関する研究にご利用いただけます。</p>
+        <dl><dt>区分</dt><dd>研究用試薬</dd><dt>形態</dt><dd><span class="todo">【確認】</span></dd><dt>規格</dt><dd><span class="todo">【確認】</span></dd></dl>
+      </article>
+      <article class="card">
+        <div class="kind">Service</div>
+        <h3>細胞培養受託<small>Cell culture service</small></h3>
+        <p>自社の培養施設で、幹細胞の培養を受託しています。培養条件のご提案から、品質試験、納品まで対応します。秘密保持契約を結んだうえでご相談を承ります。</p>
+        <dl><dt>開始</dt><dd>2025年2月</dd><dt>対象</dt><dd><span class="todo">【対応できる細胞の種類】</span></dd><dt>許可等</dt><dd><span class="todo">【許可・届出の状況】</span></dd></dl>
+      </article>
+    </div>
+
+    <div class="ruo">
+      <h3>研究用試薬についてのご注意</h3>
+      <p>本ページの製品は研究用試薬です。医薬品、医療機器、再生医療等製品ではなく、ヒトへの投与や、疾病の診断・治療・予防を目的としたものではありません。ご提供は、研究機関・企業のお客様に限ります。</p>
+    </div>
+
+    <div class="fac">
+      <figure><div class="ph"><div><div class="fn">clean1.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">培養上清製造用クリーンルーム（クリエイティブラボ神戸）</figcaption></figure>
+      <figure><div class="ph"><div><div class="fn">clean2.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">無菌環境での作業</figcaption></figure>
+      <figure><div class="ph"><div><div class="fn">vials.jpg</div><div class="what">写真</div></div></div><figcaption class="cap">リネルボＳ・リネルボＰ</figcaption></figure>
+    </div>
+    <span class="note-todo">【この欄には、効能効果、療法名、疾患名、体験談を一切追加しないこと】</span>
+  </div>
+</section>
+
+<!-- ===== 活動・実績 ===== -->
+<section class="band lilac" id="news">
+  <div class="wrap">
+    <div class="sh"><h2>活動・実績</h2><span class="en">News &amp; Milestones</span></div>
+    <p class="section-lead">国内外の学会での講演や受賞、拠点の整備など、創業からの歩みです。</p>
+    <div class="news-grid">
+      <ul class="tl">
+        <li><time>2025年6月</time><span>ベトナム・ハノイのVin大学で開かれた再生医療の国際会議で、代表の中西が基調講演</span><span class="t">講演</span></li>
+        <li><time><span class="todo">【年月】</span></time><span>台湾・国立陽明交通大学薬学部の招きにより、台北で講演（2回）</span><span class="t">講演</span></li>
+        <li><time>2025年2月</time><span>幹細胞培養の受託を開始</span><span class="t">事業</span></li>
+        <li><time>2024年8月</time><span>研究用試薬「リネルボ®」の製造販売を開始</span><span class="t">事業</span></li>
+        <li><time>2024年4月</time><span>日経バイオテクに当社の記事が掲載</span><span class="t">掲載</span></li>
+        <li><time>2024年3月</time><span>クリエイティブラボ神戸内に培養上清の製造施設が完成</span><span class="t">拠点</span></li>
+        <li><time>2023年10月</time><span>メドテックグランプリKOBE2023でエーザイ賞を受賞。バイオジャパン再生医療EXPOに出展</span><span class="t">受賞</span></li>
+        <li><time>2021年7月</time><span>神戸医療産業都市のクリエイティブラボ神戸に研究室を設置</span><span class="t">拠点</span></li>
+        <li><time>2021年1月</time><span>リジェネフォーティー株式会社を設立</span><span class="t blank"></span></li>
+        <li><time>2020年10月</time><span>岡山県「スター☆ベンチャー誕生2020」に採択（応募105件中3件）</span><span class="t">採択</span></li>
+      </ul>
+      <figure>
+        <div class="ph" style="aspect-ratio:4/3"><div><div class="fn">vn_speaker.jpg</div><div class="what">写真</div></div></div>
+        <figcaption class="cap">2025年6月、ハノイでの基調講演（Conference: Stem Cell Technology in Rejuvenation, Anti-Aging and Aesthetics）</figcaption>
+      </figure>
+    </div>
+    <span class="note-todo">【公開後は、新しい出来事を月に1回を目安にこの年表の先頭へ追加】</span>
+  </div>
+</section>
+
+<!-- ===== 会社情報 ===== -->
+<section class="band" id="company">
+  <div class="wrap">
+    <div class="sh"><h2>会社情報</h2><span class="en">Company</span></div>
+    <p class="section-lead">大学での幹細胞研究の成果を、実際に患者さんへ届く治療につなげるために設立した会社です。</p>
+
+    <div class="ceo">
+      <div class="ph"><div><div class="fn">ceo.jpg</div><div class="what">代表写真</div></div></div>
+      <div>
+        <blockquote>脊髄損傷などで失われた機能を取り戻したいと願う方々に、新しい治療の選択肢を届けたい。それが、私たちが研究を続ける理由です。動物実験では手応えのある結果を得ていますが、患者さんのもとに届けるまでには、まだ多くの段階があります。大学、医療機関、企業の皆さまと力を合わせ、一歩ずつ着実に進めてまいります。</blockquote>
+        <p class="sign">代表取締役・CEO　中西 徹</p>
+        <span class="note-todo">【代表ご本人の言葉で書き直していただく前提の下書き】</span>
+        <p class="bio">東京大学理学部卒業、農学博士（東京大学）。就実大学名誉教授、大阪大学大学院医学系研究科招聘教授。日本パスツール財団会員、硬組織再生生物学会名誉会員、Texcell Japan 研究顧問、岡山県環境放射線等測定技術委員会議長。2000年に、日本のES細胞研究のあり方について論じた論考が科学誌 Nature に掲載（Nature 405, 882）。これが再生医療研究に取り組む原点となりました。</p>
+      </div>
+    </div>
+
+    <div class="co-grid">
+      <div>
+        <h3 class="sub" style="margin-bottom:16px">会社概要</h3>
+        <div class="tbl-wrap" style="margin-top:0">
+          <table class="co">
+            <tbody>
+              <tr><th>商号</th><td>リジェネフォーティー株式会社（Regene4T Co., Ltd.）</td></tr>
+              <tr><th>設立</th><td>2021年1月</td></tr>
+              <tr><th>資本金</th><td>2,486万4,000円</td></tr>
+              <tr><th>代表者</th><td>代表取締役 中西 徹</td></tr>
+              <tr><th>本社</th><td>兵庫県神戸市中央区琴ノ緒町3丁目2番22号</td></tr>
+              <tr><th>神戸ラボ</th><td>兵庫県神戸市中央区港島南町6丁目3-7 クリエイティブラボ神戸 SCL213号室</td></tr>
+              <tr><th>岡山事務所</th><td>岡山県岡山市北区蕃山町2番12号 <span class="todo">【現在もあるか確認】</span></td></tr>
+              <tr><th>従業員数</th><td>10名（うち常勤4名） <span class="todo">【表記を確認】</span></td></tr>
+              <tr><th>事業内容</th><td>再生医療に関する研究開発、研究用試薬の製造販売、細胞培養の受託</td></tr>
+              <tr><th>支援機関</th><td>公益財団法人神戸医療産業都市推進機構、岡山県・公益財団法人岡山県産業振興財団</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="adv">
+        <h3 class="sub" style="margin-bottom:16px">アドバイザー</h3>
+        <ul>
+          <li><b>西良 浩一</b><span>徳島大学 副学長・病院長、整形外科教授</span></li>
+          <li><b>Ahnond Bunyaratvej</b><span>タイ・マヒドン大学 教授、タイ科学アカデミー会員</span></li>
+          <li><b>Nuttayakarn Sila-asna</b><span>タイ BB研究所 副所長</span></li>
+        </ul>
+        <span class="note-todo">【各氏に継続と掲載の了承を確認】</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 提携・採用 ===== -->
+<section class="band lilac" id="partner" style="padding-block:72px">
+  <div class="wrap">
+    <div class="pr">
+      <div class="box dark">
+        <h2>提携・投資のご相談</h2>
+        <p>NEcST®細胞とX4N2®細胞の臨床応用に向けて、ともに歩むパートナーを募集しています。</p>
+        <ul>
+          <li>大学・医療機関との共同研究</li>
+          <li>製薬企業などとの開発提携、ライセンス</li>
+          <li>細胞製造・品質管理に関する事業提携</li>
+          <li>資金調達に関するご相談</li>
+        </ul>
+        <p class="small">会社紹介資料をご希望の方は、お問い合わせフォームからご連絡ください。秘密保持契約を結んだうえで、詳しくご説明します。</p>
+        <a class="btn gold" href="#contact" data-topic="共同研究・開発提携について">提携について問い合わせる →</a>
+      </div>
+      <div class="box light">
+        <h2>採用情報</h2>
+        <p>再生医療の研究開発と製造を、少人数のチームで一緒に進める仲間を募集しています。</p>
+        <ul>
+          <li>研究開発・細胞培養の技術者</li>
+          <li>経営管理・事業開発</li>
+        </ul>
+        <p class="small">勤務地：神戸ラボ（神戸市中央区港島南町）<br>応募方法：お問い合わせフォームで「採用について」を選んでご連絡ください。</p>
+        <a class="btn outline" href="#contact" data-topic="採用について">採用について問い合わせる →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== お問い合わせ ===== -->
+<section class="band" id="contact">
+  <div class="wrap">
+    <div class="sh"><h2>お問い合わせ</h2><span class="en">Contact</span></div>
+    <p class="section-lead">内容を確認のうえ、担当者からご連絡します。患者さんの個人情報や機密情報は、このフォームには記入しないでください。詳しいご相談は、秘密保持契約を結んだうえで承ります。</p>
+
+    <form class="form" id="cform" novalidate>
+      <div class="f">
+        <label for="c-type">お問い合わせの種類 <span class="req">必須</span></label>
+        <select id="c-type" required>
+          <option value="">選択してください</option>
+          <option>共同研究・開発提携について</option>
+          <option>研究用試薬（リネルボ®・コングロ）について</option>
+          <option>細胞培養の受託について</option>
+          <option>投資・資金調達について</option>
+          <option>取材について</option>
+          <option>採用について</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="f"><label for="c-org">会社・機関名 <span class="opt">任意</span></label><input type="text" id="c-org" autocomplete="organization"></div>
+      <div class="f"><label for="c-name">お名前 <span class="req">必須</span></label><input type="text" id="c-name" required autocomplete="name"></div>
+      <div class="f"><label for="c-mail">メールアドレス <span class="req">必須</span></label><input type="email" id="c-mail" required autocomplete="email"></div>
+      <div class="f"><label for="c-body">お問い合わせ内容 <span class="req">必須</span></label><textarea id="c-body" required></textarea></div>
+      <label class="agree" for="c-agree"><input type="checkbox" id="c-agree" required><span><a href="#privacy">プライバシーポリシー</a>に同意して送信します。</span></label>
+      <div id="c-err" class="err" hidden>必須の項目が未入力です。入力してから送信してください。</div>
+      <div><button class="btn plum" type="submit">送信する</button></div>
+      <div id="c-sent" class="sent" hidden>送信しました。内容を確認のうえ、担当者からご連絡します。</div>
+      <p class="form-meta">通知先メールアドレス：<span class="todo">【　】</span>　返信の目安：<span class="todo">【営業日　日以内】</span>（この行は公開ページには表示しません）</p>
+    </form>
+  </div>
+</section>
+
+<!-- ===== English ===== -->
+<section class="band lilac" id="english" lang="en">
+  <div class="wrap">
+    <h2 class="en-title">About Regene4T</h2>
+    <div class="en-body">
+      <p>Regene4T Co., Ltd. is a regenerative medicine venture based in the Kobe Biomedical Innovation Cluster, Japan. We have established two proprietary stem cell lines: NEcST® cells, selected and concentrated for their capacity to differentiate into neural cells, and X4N2® cells, a cloned line that differentiates efficiently into chondrocytes.</p>
+      <p>Using these cells and their culture supernatants, we are researching new therapies for spinal cord injury and osteoarthritis. Our programs are currently at the preclinical stage.</p>
+      <p>We also manufacture research-use reagents derived from our cell lines, including Renervo®, and provide stem cell culture services. We welcome research collaborations, development partnerships and licensing discussions. Please contact us through the inquiry form above.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===== プライバシーポリシー（別ページ） ===== -->
+<main id="privacy-page" hidden>
+  <section class="pp">
+    <div class="wrap">
+      <a class="back" href="#top">← トップページへ戻る</a>
+      <h1>プライバシーポリシー</h1>
+      <article>
+        <p class="note-todo" style="margin-top:0">【先に作成した「個人情報保護・情報セキュリティ規程案」の「2. 個人情報保護方針（公表用）案」を、【　】を埋めて貼り付けます。以下は配置確認用の見本です】</p>
+        <p>リジェネフォーティー株式会社（以下「当社」）は、お預かりする個人情報の重要性を認識し、個人情報の保護に関する法律その他の関係法令を守り、以下の方針にもとづいて個人情報を適切に取り扱います。</p>
+        <section><h2>1. 取得と利用目的</h2><p>当社は、お問い合わせへの回答、共同研究・お取引に関するご連絡、採用選考、その他<span class="todo">【　】</span>のために必要な範囲で個人情報を取得し、その目的の範囲内で利用します。</p></section>
+        <section><h2>2. 第三者への提供</h2><p>法令にもとづく場合を除き、ご本人の同意なく個人情報を第三者に提供しません。</p></section>
+        <section><h2>3. 安全管理</h2><p>個人情報の漏えい、滅失、毀損を防ぐため、組織的・人的・物理的・技術的な安全管理措置を講じます。</p></section>
+        <section><h2>4. 開示等のご請求</h2><p>ご本人からの開示、訂正、利用停止等のご請求には、法令にもとづき対応します。</p></section>
+        <section><h2>5. お問い合わせ窓口</h2><p>個人情報の取扱いに関するお問い合わせは、<span class="todo">【窓口・連絡先】</span>までご連絡ください。</p></section>
+        <p class="sig">制定日：<span class="todo">【　年　月　日】</span><br>リジェネフォーティー株式会社<br>代表取締役 中西 徹</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <a class="brand" href="#top"><span class="logo" aria-hidden="true">R4</span><span><b>リジェネフォーティー株式会社</b><small>Regene4T Co., Ltd.</small></span></a>
+        <address>兵庫県神戸市中央区琴ノ緒町3丁目2番22号</address>
+      </div>
+      <nav class="flinks" aria-label="フッターメニュー">
+        <a href="#technology">技術</a><a href="#rd">研究開発</a><a href="#products">製品・サービス</a><a href="#company">会社情報</a><a href="#contact">お問い合わせ</a><a href="#privacy">プライバシーポリシー</a>
+        <a href="https://x.com/" target="_blank" rel="noopener">X</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a>
+      </nav>
+    </div>
+    <p class="copy">© 2021–2026 Regene4T Co., Ltd.　NEcST®、リネルボ® は、リジェネフォーティー株式会社の登録商標です。</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* mobile menu */
+  var btn=document.getElementById('menuBtn'),nav=document.getElementById('nav');
+  btn.addEventListener('click',function(){var o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',function(e){if(e.target.tagName==='A'){nav.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
+
+  /* two pages: top / privacy */
+  var home=document.getElementById('home'),pp=document.getElementById('privacy-page');
+  function route(){
+    var isPP=location.hash==='#privacy';
+    home.hidden=isPP;pp.hidden=!isPP;
+    if(isPP)window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange',route);
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]');if(!a)return;
+    var h=a.getAttribute('href');
+    if(h!=='#privacy'&&!home.hidden){/* normal anchor */}
+    else if(h!=='#privacy'&&home.hidden){e.preventDefault();home.hidden=false;pp.hidden=true;history.replaceState(null,'',h);var t=document.querySelector(h);if(t)t.scrollIntoView();}
+    var topic=a.getAttribute('data-topic');if(topic){document.getElementById('c-type').value=topic;}
+  });
+  route();
+
+  /* form (見本：送信先なし) */
+  var f=document.getElementById('cform');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var ok=['c-type','c-name','c-mail','c-body'].every(function(id){return document.getElementById(id).value.trim()})
+      && /.+@.+\..+/.test(document.getElementById('c-mail').value) && document.getElementById('c-agree').checked;
+    document.getElementById('c-err').hidden=ok;
+    document.getElementById('c-sent').hidden=!ok;
+  });
+
+  /* stand-in micrographs for neurite.jpg / neurite_ctrl.jpg */
+  function rng(seed){return function(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}}
+  function draw(cv){
+    var r=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+    var w=Math.max(1,r.width),h=Math.max(1,r.height);
+    cv.width=w*dpr;cv.height=h*dpr;
+    var c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+    c.fillStyle='#07060C';c.fillRect(0,0,w,h);
+    var rich=cv.dataset.neurite==='rich',rand=rng(rich?97:31);
+    var n=rich?26:24,s=Math.min(w,h)/320;
+    var cells=[];for(var i=0;i<n;i++)cells.push([rand()*w,rand()*h]);
+    function branch(x,y,a,len,wd,depth){
+      c.lineWidth=wd;c.beginPath();c.moveTo(x,y);
+      var steps=Math.max(4,len/6|0);
+      for(var k=0;k<steps;k++){a+=(rand()-.5)*.5;x+=Math.cos(a)*6*s;y+=Math.sin(a)*6*s;c.lineTo(x,y)}
+      c.stroke();
+      if(depth>0&&rand()<.8){branch(x,y,a+.5+rand()*.4,len*.6,wd*.65,depth-1);branch(x,y,a-.5-rand()*.4,len*.55,wd*.6,depth-1)}
+    }
+    c.lineCap='round';c.lineJoin='round';
+    c.shadowColor='rgba(240,190,60,.6)';c.shadowBlur=6*s;
+    c.strokeStyle='rgba(236,196,72,.92)';
+    cells.forEach(function(p,i){
+      if(rich){var m=1+(rand()*3|0);for(var j=0;j<m;j++)branch(p[0],p[1],rand()*6.28,40+rand()*60,2.2*s,3)}
+      else if(i%6===0){branch(p[0],p[1],rand()*6.28,10+rand()*10,1.4*s,0)}
+    });
+    c.shadowBlur=8*s;c.shadowColor='rgba(110,210,235,.7)';
+    cells.forEach(function(p){
+      c.fillStyle='rgba(120,210,232,.85)';c.beginPath();
+      c.ellipse(p[0],p[1],(5+rand()*3)*s,(4+rand()*2)*s,rand()*3,0,6.28);c.fill();
+    });
+    c.shadowBlur=0;
+  }
+  var cvs=[].slice.call(document.querySelectorAll('canvas[data-neurite]'));
+  function all(){cvs.forEach(draw)}
+  all();
+  if('ResizeObserver' in window){var ro=new ResizeObserver(function(){all()});cvs.forEach(function(cv){ro.observe(cv)})}
+})();
+</script>
+</body>
+</html>
